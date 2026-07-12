@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rock Paper Scissors</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- Heading -->
+
+        <h1>
+            <i class="fa-solid fa-gamepad"></i>
+            Rock Paper Scissors
+        </h1>
+
+        <!-- High Score -->
+
+        <div class="high-score">
+            <i class="fa-solid fa-trophy"></i>
+            High Score :
+            <span id="highScore">0</span>
+        </div>
+
+        <!-- Scoreboard -->
+
+        <div class="score-card">
+
+            <div class="score" id="playerCard">
+
+                <p>
+                    <i class="fa-solid fa-user"></i>
+                    You
+                </p>
+
+                <span id="playerScore">0</span>
+
+            </div>
+
+            <div class="vs">
+                VS
+            </div>
+
+            <div class="score" id="computerCard">
+
+                <p>
+                    <i class="fa-solid fa-computer"></i>
+                    Computer
+                </p>
+
+                <span id="computerScore">0</span>
+
+            </div>
+
+        </div>
+
+        <!-- Choices -->
+
+        <div class="choices">
+
+            <button class="choice rock" data-choice="rock">
+
+                <i class="fa-solid fa-hand-back-fist"></i>
+
+                <span>Rock</span>
+
+            </button>
+
+            <button class="choice paper" data-choice="paper">
+
+                <i class="fa-solid fa-hand"></i>
+
+                <span>Paper</span>
+
+            </button>
+
+            <button class="choice scissors" data-choice="scissors">
+
+                <i class="fa-solid fa-hand-scissors"></i>
+
+                <span>Scissors</span>
+
+            </button>
+
+        </div>
+
+        <!-- Choice Display -->
+
+        <div class="display">
+
+            <div class="box">
+
+                <h3>You Chose</h3>
+
+                <div id="playerChoice">
+                    ?
+                </div>
+
+            </div>
+
+            <div class="box">
+
+                <h3>Computer Chose</h3>
+
+                <div id="computerChoice">
+                    ?
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Result -->
+
+        <div id="result" class="fade-result">
+
+            Choose your weapon
+
+        </div>
+
+        <!-- Buttons -->
+
+        <div class="buttons">
+
+            <button id="resetBtn">
+
+                <i class="fa-solid fa-rotate-right"></i>
+
+                Reset Game
+
+            </button>
+
+            <button id="themeBtn">
+
+                🌙 Toggle Theme
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Confetti -->
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <!-- JavaScript -->
+
+    <script src="app.js"></script>
+
+</body>
+
+</html>
