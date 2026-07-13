@@ -1,13 +1,4 @@
-// ==========================================================
-// ROCK PAPER SCISSORS
-// Portfolio Edition
-// Part 1
-// ==========================================================
-
-// ==========================
 // DOM ELEMENTS
-// ==========================
-
 const buttons = document.querySelectorAll(".choice");
 
 const playerScoreEl = document.getElementById("playerScore");
@@ -26,11 +17,159 @@ const computerCard = document.getElementById("computerCard");
 
 const highScoreEl = document.getElementById("highScore");
 
+// Voice Input Elements
+const voiceBtn = document.getElementById("voiceBtn");
+const voiceStatus = document.getElementById("voiceStatus");
+const voiceTranscript = document.getElementById("voiceTranscript");
 
-// ==========================
+// Speech Recognition Support
+const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
+let recognition = null;
+let isListening = false;
+
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
+
+    recognition.lang = "en-US";
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+} else {
+    voiceBtn.disabled = true;
+    voiceStatus.textContent =
+        "Voice recognition is not supported on this browser.";
+}
+
+// Start Voice Recognition
+function startListening() {
+
+    if (!recognition || isListening) return;
+
+    // Play click sound
+    clickSound.currentTime = 0;
+    clickSound.play().catch(() => {});
+
+    if ("vibrate" in navigator) {
+        navigator.vibrate(40);
+    }
+
+    isListening = true;
+
+    voiceTranscript.textContent = "";
+
+    voiceStatus.textContent = "Listening...";
+    voiceStatus.className = "voice-status listening";
+
+    voiceBtn.classList.add("listening");
+
+    recognition.start();
+
+    // Stop automatically after 3 seconds
+    setTimeout(() => {
+        if (isListening) {
+            recognition.stop();
+        }
+    }, 3000);
+}
+// Click microphone button
+voiceBtn.addEventListener("click", startListening);
+
+// Voice Recognition Results
+let detectedChoice = "";
+
+recognition.onresult = (event) => {
+
+    let transcript = "";
+
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript + " ";
+    }
+
+    transcript = transcript.trim().toLowerCase();
+
+    // Live transcript
+    voiceTranscript.textContent = transcript;
+
+    // Detect valid choice
+    if (
+        transcript.includes("rock") ||
+        transcript.includes("lock")
+    ) {
+        detectedChoice = "rock";
+    }
+    else if (
+        transcript.includes("paper") ||
+        transcript.includes("pepper")
+    ) {
+        detectedChoice = "paper";
+    }
+    else if (
+        transcript.includes("scissors") ||
+        transcript.includes("scissor") ||
+        transcript.includes("caesar") ||
+        transcript.includes("sizors") ||
+        transcript.includes("scisors") ||
+        transcript.includes("sizzer") ||
+        transcript.includes("scissor's")
+    ) {
+        detectedChoice = "scissors";
+    }
+    };
+
+// Recognition Finished
+recognition.onend = () => {
+
+    isListening = false;
+
+    voiceBtn.classList.remove("listening");
+
+    if (detectedChoice) {
+
+        const choice = detectedChoice; // Save it
+
+        voiceStatus.textContent = `Detected: ${choice}`;
+        voiceStatus.className = "voice-status success";
+
+        // Reset for next attempt
+        detectedChoice = "";
+
+        setTimeout(() => {
+            if (!gameOver) {
+                playRound(choice);
+            }
+        }, 100);
+
+    } else {
+
+        voiceStatus.textContent = "Try Again";
+        voiceStatus.className = "voice-status error";
+
+    }
+    setTimeout(() => {
+        voiceStatus.textContent = "Tap the microphone and say Rock, Paper or Scissors";
+        voiceStatus.className = "voice-status";
+        voiceTranscript.textContent = "";
+    }, 2000);
+
+};
+
+// Recognition Error
+recognition.onerror = () => {
+
+    isListening = false;
+
+    voiceBtn.classList.remove("listening");
+
+    voiceStatus.textContent = "Try Again";
+    voiceStatus.className = "voice-status error";
+
+    detectedChoice = "";
+
+};
+
 // SOUNDS
-// ==========================
-
 const clickSound = new Audio("assets/click.mp3");
 const winSound = new Audio("assets/win.mp3");
 const loseSound = new Audio("assets/lose.mp3");
@@ -41,10 +180,7 @@ winSound.volume = 0.5;
 loseSound.volume = 0.5;
 drawSound.volume = 0.5;
 
-
-// ==========================
 // GAME DATA
-// ==========================
 
 const choices = ["rock", "paper", "scissors"];
 
@@ -65,10 +201,7 @@ let gameOver = false;
 
 let thinkingInterval = null;
 
-
-// ==========================
 // LOCAL STORAGE
-// ==========================
 
 let highScore = Number(localStorage.getItem("highScore")) || 0;
 
@@ -85,10 +218,7 @@ if(savedTheme==="light"){
 
 }
 
-
-// ==========================
 // EVENT LISTENERS
-// ==========================
 
 buttons.forEach(button=>{
 
@@ -104,17 +234,12 @@ buttons.forEach(button=>{
 
 
 // Reset
-
 resetBtn.addEventListener("click",resetGame);
 
-
 // Theme
-
 themeBtn.addEventListener("click",toggleTheme);
 
-
 // Keyboard
-
 document.addEventListener("keydown",event=>{
 
     if(gameOver) return;
@@ -139,11 +264,7 @@ document.addEventListener("keydown",event=>{
 
 });
 
-
-// ==========================
 // PLAY ROUND
-// ==========================
-
 function playRound(playerChoice){
     clickSound.currentTime = 0;
 
@@ -226,11 +347,7 @@ function playRound(playerChoice){
 
 }
 
-
-// ==========================
 // THINKING ANIMATION
-// ==========================
-
 function startThinkingAnimation(){
 
     const frames = [
@@ -273,16 +390,8 @@ function stopThinkingAnimation(){
     clearInterval(thinkingInterval);
 
 }
-// ==========================================================
-// PART 2
-// Continue below Part 1
-// ==========================================================
 
-
-// ==========================
 // COMPUTER CHOICE
-// ==========================
-
 function getComputerChoice(){
 
     const random=Math.floor(Math.random()*choices.length);
@@ -291,11 +400,7 @@ function getComputerChoice(){
 
 }
 
-
-// ==========================
 // WINNER LOGIC
-// ==========================
-
 function getWinner(player,computer){
 
     if(player===computer){
@@ -322,11 +427,7 @@ function getWinner(player,computer){
 
 }
 
-
-// ==========================
 // UPDATE SCORE
-// ==========================
-
 function updateScore(){
 
     playerScoreEl.textContent=playerScore;
@@ -335,11 +436,7 @@ function updateScore(){
 
 }
 
-
-// ==========================
 // SCORE ANIMATION
-// ==========================
-
 function animateScore(element){
 
     element.classList.add("animate");
@@ -372,11 +469,7 @@ function animateScore(element){
 
 }
 
-
-// ==========================
 // GAME WINNER
-// ==========================
-
 function checkGameWinner(){
 
     if(playerScore>=5){
@@ -415,11 +508,7 @@ function checkGameWinner(){
 
 }
 
-
-// ==========================
 // BUTTONS
-// ==========================
-
 function disableButtons(){
 
     buttons.forEach(button=>{
@@ -441,11 +530,7 @@ function enableButtons(){
 
 }
 
-
-// ==========================
 // RESULT FADE
-// ==========================
-
 function resultFade(text){
 
     resultEl.style.opacity=0;
@@ -460,11 +545,7 @@ function resultFade(text){
 
 }
 
-
-// ==========================
 // WINNER GLOW
-// ==========================
-
 function removeWinnerGlow(){
 
     playerCard.classList.remove("winner");
@@ -473,11 +554,7 @@ function removeWinnerGlow(){
 
 }
 
-
-// ==========================
 // SHAKE SCREEN
-// ==========================
-
 function shakeScreen(){
 
     const container=document.querySelector(".container");
@@ -492,11 +569,7 @@ function shakeScreen(){
 
 }
 
-
-// ==========================
 // CONFETTI
-// ==========================
-
 function celebrate(){
 
     confetti({
@@ -511,11 +584,7 @@ function celebrate(){
 
 }
 
-
-// ==========================
 // THEME
-// ==========================
-
 function toggleTheme(){
 
     document.body.classList.toggle("light");
@@ -534,11 +603,7 @@ function toggleTheme(){
 
 }
 
-
-// ==========================
 // RESET
-// ==========================
-
 function resetGame(){
 
     playerScore=0;
@@ -563,11 +628,6 @@ function resetGame(){
 
 }
 
-
-// ==========================
 // INITIALIZE
-// ==========================
-
 updateScore();
-
 highScoreEl.textContent=highScore;
