@@ -20,7 +20,75 @@ const highScoreEl = document.getElementById("highScore");
 // Voice Input Elements
 const voiceBtn = document.getElementById("voiceBtn");
 const voiceStatus = document.getElementById("voiceStatus");
+const orbStatus = document.getElementById("orbStatus");
 const voiceTranscript = document.getElementById("voiceTranscript");
+const voicePanel = document.getElementById("voicePanel");
+const voiceBubble = document.getElementById("voiceBubble");
+const voiceWave = document.getElementById("voiceWave");
+const assistantOrb = document.getElementById("assistantOrb");
+let audioContext;
+let analyser;
+let microphoneStream;
+let volumeAnimation;
+
+function setOrbState(state, text = "") {
+    assistantOrb.className = `assistant-orb ${state}`;
+    if (text) {
+        orbStatus.textContent = text;
+    }
+}
+function showVoicePanel() {
+    voicePanel.classList.remove("hidden");
+}
+function hideVoicePanel() {
+    voicePanel.classList.add("hidden");
+}
+function setVoiceBubble(message) {
+    voiceBubble.textContent = message;
+}
+function startWave() {
+    voiceWave.style.opacity = "1";
+}
+function stopWave() {
+    voiceWave.style.opacity = "0";
+}
+function showSuccessState(){
+    voicePanel.classList.remove("error");
+    voicePanel.classList.add("success");
+}
+function showErrorState(){
+    voicePanel.classList.remove("success");
+    voicePanel.classList.add("error");
+}
+function clearVoiceState(){
+    voicePanel.classList.remove("success","error");
+}
+function updateTranscript(text) {
+    voiceTranscript.innerHTML = `
+        <span class="transcript-label">You said</span>
+        <span class="transcript-text">"${text}"</span>
+    `;
+}
+function startVolumeMeter(){
+    navigator.mediaDevices.getUserMedia({audio:true})
+    .then(stream=>{
+        microphoneStream = stream;
+        audioContext = new AudioContext();
+        analyser = audioContext.createAnalyser();
+        const source = audioContext.createMediaStreamSource(stream);
+        source.connect(analyser);
+        analyser.fftSize = 256;
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        function animateVolume(){
+            analyser.getByteFrequencyData(dataArray);
+            let volume = dataArray.reduce((a,b)=>a+b)/dataArray.length;
+            assistantOrb.style.transform = 
+            `scale(${1 + volume/500})`;
+            volumeAnimation = requestAnimationFrame(animateVolume);
+        }
+        animateVolume();
+    });
+}
 
 // Speech Recognition Support
 const SpeechRecognition =
@@ -59,11 +127,6 @@ function startListening() {
 
     voiceTranscript.textContent = "";
 
-    voiceStatus.textContent = "Listening...";
-    voiceStatus.className = "voice-status listening";
-
-    voiceBtn.classList.add("listening");
-
     recognition.start();
 
     // Stop automatically after 3 seconds
@@ -74,7 +137,20 @@ function startListening() {
     }, 3000);
 }
 // Click microphone button
-voiceBtn.addEventListener("click", startListening);
+voiceBtn.addEventListener("click", () => {
+    startListening();
+});
+
+recognition.onstart = () => {
+    startVolumeMeter();
+    startWave();
+    showVoicePanel();
+    setVoiceBubble("🎤 Listening...");
+    voiceStatus.textContent = "Listening...";
+    voiceStatus.className = "voice-status listening";
+    voiceBtn.classList.add("listening");
+    setOrbState("listening", "Listening...");
+};
 
 // Voice Recognition Results
 let detectedChoice = "";
@@ -90,7 +166,8 @@ recognition.onresult = (event) => {
     transcript = transcript.trim().toLowerCase();
 
     // Live transcript
-    voiceTranscript.textContent = transcript;
+    updateTranscript(transcript);
+    setVoiceBubble(`You said: "${transcript}"`);
 
     // Detect valid choice
     if (
@@ -116,43 +193,50 @@ recognition.onresult = (event) => {
     ) {
         detectedChoice = "scissors";
     }
-    };
+    setOrbState("processing", "Processing...");
+};
 
 // Recognition Finished
 recognition.onend = () => {
-
+    cancelAnimationFrame(volumeAnimation);
+    if(microphoneStream){
+        microphoneStream.getTracks().forEach(track=>track.stop());
+    }
     isListening = false;
-
     voiceBtn.classList.remove("listening");
-
+    stopWave();
     if (detectedChoice) {
-
-        const choice = detectedChoice; // Save it
-
-        voiceStatus.textContent = `Detected: ${choice}`;
-        voiceStatus.className = "voice-status success";
-
-        // Reset for next attempt
+        const choice = detectedChoice;
+        voiceStatus.textContent = "Processing...";
+        voiceStatus.className = "voice-status processing";
+        setVoiceBubble("⚙ Processing your voice...");
         detectedChoice = "";
-
         setTimeout(() => {
+            voiceStatus.textContent = `Detected: ${choice}`;
+            voiceStatus.className = "voice-status success";
+            setVoiceBubble(`✅ ${choice} detected`);
+            showSuccessState();
             if (!gameOver) {
                 playRound(choice);
             }
-        }, 100);
-
-    } else {
-
+        }, 500);
+    }
+    else {
         voiceStatus.textContent = "Try Again";
         voiceStatus.className = "voice-status error";
+        setVoiceBubble("❌ I didn't understand. Try again.");
+        showErrorState();
 
     }
     setTimeout(() => {
+        clearVoiceState(); 
+        setTimeout(hideVoicePanel, 2000);
         voiceStatus.textContent = "Tap the microphone and say Rock, Paper or Scissors";
         voiceStatus.className = "voice-status";
-        voiceTranscript.textContent = "";
+        voiceTranscript.innerHTML = "";
+        setVoiceBubble("Tap the microphone to speak.");
+        setOrbState("idle", "Tap the microphone");
     }, 2000);
-
 };
 
 // Recognition Error
@@ -161,9 +245,17 @@ recognition.onerror = () => {
     isListening = false;
 
     voiceBtn.classList.remove("listening");
+    stopWave();
 
     voiceStatus.textContent = "Try Again";
     voiceStatus.className = "voice-status error";
+    setVoiceBubble("❌ Voice recognition failed.");
+    showErrorState();
+    
+    setTimeout(() => {
+        clearVoiceState();
+        setTimeout(hideVoicePanel, 2000);
+    }, 2000);
 
     detectedChoice = "";
 
