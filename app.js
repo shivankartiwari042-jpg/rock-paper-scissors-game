@@ -26,8 +26,6 @@ const voicePanel = document.getElementById("voicePanel");
 const voiceBubble = document.getElementById("voiceBubble");
 const voiceWave = document.getElementById("voiceWave");
 const assistantOrb = document.getElementById("assistantOrb");
-let audioContext;
-let analyser;
 let microphoneStream;
 let volumeAnimation;
 
@@ -68,26 +66,6 @@ function updateTranscript(text) {
         <span class="transcript-label">You said</span>
         <span class="transcript-text">"${text}"</span>
     `;
-}
-function startVolumeMeter(){
-    navigator.mediaDevices.getUserMedia({audio:true})
-    .then(stream=>{
-        microphoneStream = stream;
-        audioContext = new AudioContext();
-        analyser = audioContext.createAnalyser();
-        const source = audioContext.createMediaStreamSource(stream);
-        source.connect(analyser);
-        analyser.fftSize = 256;
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        function animateVolume(){
-            analyser.getByteFrequencyData(dataArray);
-            let volume = dataArray.reduce((a,b)=>a+b)/dataArray.length;
-            assistantOrb.style.transform = 
-            `scale(${1 + volume/500})`;
-            volumeAnimation = requestAnimationFrame(animateVolume);
-        }
-        animateVolume();
-    });
 }
 
 // Speech Recognition Support
@@ -142,7 +120,6 @@ voiceBtn.addEventListener("click", () => {
 });
 
 recognition.onstart = () => {
-    // startVolumeMeter();
     startWave();
     showVoicePanel();
     setVoiceBubble("🎤 Listening...");
