@@ -24,17 +24,20 @@
 <body>
 
     <div class="container">
+
         <!-- Heading -->
         <h1>
             <i class="fa-solid fa-gamepad"></i>
             Rock Paper Scissors
         </h1>
+
         <!-- High Score -->
         <div class="high-score">
             <i class="fa-solid fa-trophy"></i>
             High Score :
             <span id="highScore">0</span>
         </div>
+
         <!-- Scoreboard -->
         <div class="score-card">
             <div class="score" id="playerCard">
@@ -44,9 +47,11 @@
                 </p>
                 <span id="playerScore">0</span>
             </div>
+
             <div class="vs">
                 VS
             </div>
+
             <div class="score" id="computerCard">
                 <p>
                     <i class="fa-solid fa-computer"></i>
@@ -55,32 +60,41 @@
                 <span id="computerScore">0</span>
             </div>
         </div>
+
         <!-- Choices -->
         <div class="choices">
             <button class="choice rock" data-choice="rock">
                 <i class="fa-solid fa-hand-back-fist"></i>
                 <span>Rock</span>
             </button>
+
             <button class="choice paper" data-choice="paper">
                 <i class="fa-solid fa-hand"></i>
                 <span>Paper</span>
             </button>
+
             <button class="choice scissors" data-choice="scissors">
                 <i class="fa-solid fa-hand-scissors"></i>
                 <span>Scissors</span>
             </button>
         </div>
+
         <!-- Voice Input -->
         <div class="voice-container">
+
             <button id="voiceBtn" class="voice-btn" aria-label="Voice Input">
                 <i class="fa-solid fa-microphone"></i>
             </button>
+
             <div id="voiceStatus" class="voice-status">
                 Tap the microphone and say Rock, Paper or Scissors
             </div>
+
             <div id="voiceTranscript" class="voice-transcript"></div>
+
             <!-- Premium Voice Panel -->
             <div class="voice-panel hidden" id="voicePanel">
+
                 <div class="voice-wave" id="voiceWave">
                     <span></span>
                     <span></span>
@@ -88,56 +102,197 @@
                     <span></span>
                     <span></span>
                 </div>
+
                 <div class="voice-bubble" id="voiceBubble">
                     Tap the microphone to speak.
                 </div>
+
             </div>
+
         </div>
-        <!--Voice Assistant-->
+
+        <!-- AI Assistant -->
+        <div class="assistant-card">
+
+            <div class="assistant-header">
+                🤖 AI Assistant
+            </div>
+
+            <p id="assistantMessage" class="assistant-message">
+                Ready to play.
+            </p>
+
+        </div>
+
+        <!-- Voice Assistant -->
         <div class="voice-assistant">
+
             <div id="assistantOrb" class="assistant-orb idle">
                 <div class="orb-core"></div>
                 <div class="orb-ring ring1"></div>
                 <div class="orb-ring ring2"></div>
                 <div class="orb-ring ring3"></div>
             </div>
+
             <p id="orbStatus">
                 Tap the microphone
             </p>
+
         </div>
+
         <!-- Choice Display -->
         <div class="display">
+
             <div class="box">
                 <h3>You Chose</h3>
-                <div id="playerChoice">
-                    ?
-                </div>
+                <div id="playerChoice">?</div>
             </div>
+
             <div class="box">
                 <h3>Computer Chose</h3>
-                <div id="computerChoice">
-                    ?
-                </div>
+                <div id="computerChoice">?</div>
             </div>
+
         </div>
+
         <!-- Result -->
         <div id="result" class="fade-result">
             Choose your weapon
         </div>
+
         <!-- Buttons -->
         <div class="buttons">
+
             <button id="resetBtn">
                 <i class="fa-solid fa-rotate-right"></i>
                 Reset Game
             </button>
+
             <button id="themeBtn">
                 🌙 Toggle Theme
             </button>
+
         </div>
+
+        <!-- Statistics -->
+        <div class="stats-card">
+
+            <h2>📊 Game Statistics</h2>
+
+            <div class="stats-grid">
+
+                <div class="stat-item">
+                    <span>Total Games</span>
+                    <strong id="totalGames">0</strong>
+                </div>
+
+                <div class="stat-item">
+                    <span>Wins</span>
+                    <strong id="winsStat">0</strong>
+                </div>
+
+                <div class="stat-item">
+                    <span>Losses</span>
+                    <strong id="lossesStat">0</strong>
+                </div>
+
+                <div class="stat-item">
+                    <span>Draws</span>
+                    <strong id="drawsStat">0</strong>
+                </div>
+
+                <div class="stat-item">
+                    <span>Win Rate</span>
+                    <strong id="winRate">0%</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Move Analytics -->
+        <div class="stats-card move-stats-card">
+            <div class="stats-header">
+                <h3>Most Used Move</h3>
+            </div>
+            <div class="most-used-move">
+                <div class="move-icon" id="mostUsedMoveIcon">➖</div>
+                <div class="move-name" id="mostUsedMoveName">No Data</div>
+            </div>
+            <div class="move-breakdown">
+                <div class="move-row">
+                    <span>🪨 Rock</span>
+                    <span id="rockUsage">0 (0%)</span>
+                </div>
+                <div class="move-progress">
+                    <div id="rockBar" class="move-progress-fill"></div>
+                </div>
+                <div class="move-row">
+                    <span>📄 Paper</span>
+                    <span id="paperUsage">0 (0%)</span>
+                </div>
+                <div class="move-progress">
+                    <div id="paperBar" class="move-progress-fill"></div>
+                </div>
+                <div class="move-row">
+                    <span>✂️ Scissors</span>
+                    <span id="scissorsUsage">0 (0%)</span>
+                </div>
+                <div class="move-progress">
+                    <div id="scissorsBar" class="move-progress-fill"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Session History -->
+        <div class="stats-card history-card">
+            <div class="stats-header">
+                <h3>Recent Matches</h3>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="history-empty">
+                    Play a game to see your recent matches.
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Insights -->
+        <div class="stats-card insights-card">
+
+            <div class="stats-header">
+                <h3>Performance Insights</h3>
+            </div>
+
+            <div class="insight-grid">
+                <div class="insight-item">
+                    <span class="insight-label">Favorite Move</span>
+                    <span class="insight-value" id="favoriteMove">-</span>
+                </div>
+                <div class="insight-item">
+                    <span class="insight-label">Current Streak</span>
+                    <span class="insight-value" id="currentStreak">0</span>
+                </div>
+                <div class="insight-item">
+                    <span class="insight-label">Best Streak</span>
+                    <span class="insight-value" id="bestStreak">0</span>
+                </div>
+                <div class="insight-item">
+                    <span class="insight-label">Performance</span>
+                            <span class="insight-value" id="performanceRating">-</span>
+                </div>
+            </div>
+        </div>
+
     </div>
+
     <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
     <!-- JavaScript -->
     <script src="app.js"></script>
+
 </body>
+
 </html>
+
