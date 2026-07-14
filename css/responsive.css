@@ -1,0 +1,172 @@
+@media (max-width:900px) {
+
+    .container {
+        padding: 30px;
+    }
+
+    .choice {
+        width: 160px;
+        height: 160px;
+    }
+
+    .choice i {
+        font-size: 58px;
+    }
+
+}
+
+@media (max-width:768px) {
+
+    .score-card {
+        flex-direction: column;
+    }
+
+    .display {
+        grid-template-columns: 1fr;
+    }
+
+    .buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .choice {
+        width: 150px;
+        height: 150px;
+        font-size: 20px;
+    }
+
+    .choice i {
+        font-size: 55px;
+    }
+
+    #playerChoice,
+    #computerChoice {
+        font-size: 58px;
+    }
+
+    h1 {
+        font-size: 34px;
+    }
+
+    #result {
+        font-size: 24px;
+    }
+
+    .voice-panel {
+        width: 100%;
+        padding: 16px;
+    }
+
+    .voice-bubble {
+        max-width: 100%;
+        font-size: .9rem;
+    }
+
+    .move-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 1.7rem;
+    }
+
+    .move-name {
+        font-size: 1rem;
+    }
+
+    .history-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .insight-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width:600px) {
+
+    .voice-btn {
+        width: 62px;
+        height: 62px;
+        font-size: 1.5rem;
+    }
+
+    .voice-status {
+        font-size: .9rem;
+    }
+
+    .voice-transcript {
+        width: 95%;
+        font-size: .9rem;
+    }
+
+    .performance-chart-card {
+        padding: 18px;
+    }
+
+    .chart-row {
+        grid-template-columns: 60px 1fr 38px;
+        gap: 10px;
+    }
+
+    .chart-track {
+        height: 12px;
+    }
+
+    .stats-actions {
+        flex-direction: column;
+    }
+
+    .stats-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+}
+
+@media (max-width:500px) {
+
+    .container {
+        width: 95%;
+        padding: 20px;
+    }
+
+    .choice {
+        width: 120px;
+        height: 120px;
+        gap: 10px;
+    }
+
+    .choice i {
+        font-size: 42px;
+    }
+
+    .choice span {
+        font-size: 16px;
+    }
+
+    .score span {
+        font-size: 34px;
+    }
+
+    #playerChoice,
+    #computerChoice {
+        font-size: 46px;
+    }
+
+    #resetBtn,
+    #themeBtn {
+        width: 100%;
+    }
+
+    .high-score {
+        font-size: 18px;
+    }
+
+}
