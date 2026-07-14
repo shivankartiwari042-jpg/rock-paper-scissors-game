@@ -284,8 +284,71 @@
             </div>
         </div>
 
+        <!-- Achievement System -->
+        <div class="stats-card achievements-card">
+            <div class="card-header">
+                <h2>🏆 Achievements</h2>
+            </div>
+            <div class="achievement-grid">
+                <div class="achievement-card locked" id="badge-first-win">
+                    <span class="achievement-icon">🥇</span>
+                    <h4>First Victory</h4>
+                    <p>Win your first game</p>
+                </div>
+                <div class="achievement-card locked" id="badge-streak-3">
+                    <span class="achievement-icon">🔥</span>
+                    <h4>On Fire</h4>
+                    <p>Win 3 games in a row</p>
+                </div>
+                <div class="achievement-card locked" id="badge-10-wins">
+                    <span class="achievement-icon">🏅</span>
+                    <h4>Champion</h4>
+                    <p>Win 10 games</p>
+                </div>
+                <div class="achievement-card locked" id="badge-25-games">
+                    <span class="achievement-icon">🎮</span>
+                    <h4>Veteran</h4>
+                    <p>Play 25 games</p>
+                </div>
+                <div class="achievement-card locked" id="badge-75-rate">
+                    <span class="achievement-icon">⭐</span>
+                    <h4>Elite Player</h4>
+                    <p>75% Win Rate (20+ games)</p>
+                </div>
+            </div>
+        </div>
+        <div class="stats-actions">
+            <button id="exportStatsBtn" class="stats-btn export-btn">
+                <i class="fas fa-download"></i>
+                Export Stats
+            </button>
+            <button id="resetStatsBtn" class="stats-btn reset-btn">
+                <i class="fas fa-trash-alt"></i>
+        Reset Stats
+            </button>
+        </div>
     </div>
-
+    <div id="resetModal" class="modal-overlay">
+        <div class="reset-modal">
+            <div class="modal-icon">
+                <i class="fas fa-triangle-exclamation"></i>
+            </div>
+            <h2>Reset Statistics?</h2>
+            <p>
+                This will permanently delete all statistics,
+                achievements, streaks and saved progress.
+                This action cannot be undone.
+            </p>
+            <div class="modal-buttons">
+                <button id="cancelResetBtn" class="modal-btn cancel-btn">
+                    Cancel
+                </button>
+                <button id="confirmResetBtn" class="modal-btn confirm-btn">
+                    Yes, Reset Everything
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- Confetti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
