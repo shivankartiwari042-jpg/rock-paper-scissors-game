@@ -1770,5 +1770,279 @@ text-shadow:
     .insight-grid{
         grid-template-columns:1fr;
     }
+}
+
+/* ===============================
+   ACHIEVEMENT SYSTEM
+================================= */
+
+.achievement-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.achievement-card {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 22px 16px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    backdrop-filter: blur(15px);
+    transition: all .35s ease;
+    cursor: default;
+}
+
+.achievement-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 28px rgba(0,0,0,.25);
+}
+
+.achievement-icon {
+    font-size: 2.4rem;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.achievement-card h4 {
+    margin-bottom: 8px;
+    font-size: 1rem;
+}
+
+.achievement-card p {
+    font-size: .88rem;
+    opacity: .8;
+    line-height: 1.4;
+}
+
+/* Locked */
+
+.achievement-card.locked {
+    filter: grayscale(100%);
+    opacity: .45;
+}
+
+/* Unlocked */
+
+.achievement-card.unlocked {
+    filter: grayscale(0%);
+    opacity: 1;
+    border: 2px solid #facc15;
+    box-shadow:
+        0 0 18px rgba(250,204,21,.35),
+        0 10px 25px rgba(0,0,0,.25);
+}
+
+/* Shine */
+
+.achievement-card.unlocked::before {
+    content: "";
+    position: absolute;
+    top: -120%;
+    left: -60%;
+    width: 45%;
+    height: 300%;
+    background: rgba(255,255,255,.35);
+    transform: rotate(25deg);
+    animation: achievementShine 4s linear infinite;
+}
+
+@keyframes achievementShine {
+
+    0% {
+        left: -70%;
+    }
+
+    100% {
+        left: 160%;
+    }
+
+}
+
+/* Unlock Animation */
+
+.achievement-unlock {
+    animation: achievementUnlock .8s ease;
+}
+
+@keyframes achievementUnlock {
+
+    0% {
+        transform: scale(.6);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+}
+/* ===========================
+   Statistics Action Buttons
+=========================== */
+
+.stats-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+.stats-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 22px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: 0.25s ease;
+    color: #fff;
+}
+
+.stats-btn i {
+    font-size: 1rem;
+}
+
+.export-btn {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    box-shadow: 0 8px 18px rgba(37,99,235,.25);
+}
+
+.export-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(37,99,235,.35);
+}
+
+.reset-btn {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 8px 18px rgba(220,38,38,.25);
+}
+
+.reset-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px rgba(220,38,38,.35);
+}
+
+.stats-btn:active {
+    transform: scale(.97);
+}
+
+@media (max-width: 600px) {
+
+    .stats-actions {
+        flex-direction: column;
+    }
+
+    .stats-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+}
+/* ===========================
+   Reset Confirmation Modal
+=========================== */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: .3s ease;
+    z-index: 9999;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.reset-modal {
+    width: min(420px, 90%);
+    background: rgba(255,255,255,.12);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    transform: scale(.9);
+    transition: .3s ease;
+}
+
+.modal-overlay.show .reset-modal {
+    transform: scale(1);
+}
+
+.modal-icon {
+    font-size: 3rem;
+    color: #ffb300;
+    margin-bottom: 15px;
+}
+
+.reset-modal h2 {
+    margin-bottom: 12px;
+}
+
+.reset-modal p {
+    line-height: 1.6;
+    opacity: .85;
+    margin-bottom: 25px;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.modal-btn {
+    flex: 1;
+    border: none;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: .25s;
+}
+
+.cancel-btn {
+    background: #64748b;
+    color: white;
+}
+
+.confirm-btn {
+    background: #dc2626;
+    color: white;
+}
+
+.modal-btn:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width:600px){
+
+    .modal-buttons{
+        flex-direction:column;
+    }
 
 }
