@@ -688,6 +688,9 @@ function resetAllStatistics() {
   document.getElementById("currentStreak").textContent = "0";
   document.getElementById("bestStreak").textContent = "0";
   document.getElementById("performanceRating").textContent = "Beginner";
+  highScore = 0;
+  highScoreEl.textContent = 0;
+  localStorage.setItem("highScore", 0);
   renderAchievements();
   resetModal.classList.remove("show");
 }
