@@ -9,6 +9,12 @@ const computerChoiceEl = document.getElementById("computerChoice");
 
 const resultEl = document.getElementById("result");
 
+const resetStatsBtn = document.getElementById("resetStatsBtn");
+const exportStatsBtn = document.getElementById("exportStatsBtn");
+
+const resetModal = document.getElementById("resetModal");
+const cancelResetBtn = document.getElementById("cancelResetBtn");
+const confirmResetBtn = document.getElementById("confirmResetBtn");
 const resetBtn = document.getElementById("resetBtn");
 const themeBtn = document.getElementById("themeBtn");
 
@@ -16,6 +22,13 @@ const playerCard = document.getElementById("playerCard");
 const computerCard = document.getElementById("computerCard");
 
 const highScoreEl = document.getElementById("highScore");
+
+// Achievement Badges
+const badgeFirstWin = document.getElementById("badge-first-win");
+const badgeStreak3 = document.getElementById("badge-streak-3");
+const badge10Wins = document.getElementById("badge-10-wins");
+const badge25Games = document.getElementById("badge-25-games");
+const badge75Rate = document.getElementById("badge-75-rate");
 
 // Voice Input Elements
 const voiceBtn = document.getElementById("voiceBtn");
@@ -36,26 +49,126 @@ const lossesStatEl = document.getElementById("lossesStat");
 const drawsStatEl = document.getElementById("drawsStat");
 const winRateEl = document.getElementById("winRate");
 
+function loadAchievements() {
+  const saved = localStorage.getItem("rpsAchievements");
+  if (saved) {
+    achievements = JSON.parse(saved);
+  }
+}
+
+function saveAchievements() {
+  localStorage.setItem("rpsAchievements", JSON.stringify(achievements));
+}
+function saveStats() {
+  localStorage.setItem(
+    "rpsStats",
+    JSON.stringify({
+      totalGames,
+      wins,
+      losses,
+      draws,
+      moveStats,
+      gamesPlayed,
+      gamesWon,
+      gamesLost,
+      currentGameWinStreak,
+      bestGameWinStreak,
+      currentWinStreak,
+      bestWinStreak,
+      matchHistory,
+    }),
+  );
+}
+function loadStats() {
+  const saved = localStorage.getItem("rpsStats");
+  if (!saved) return;
+  const stats = JSON.parse(saved);
+  totalGames = stats.totalGames ?? 0;
+  wins = stats.wins ?? 0;
+  losses = stats.losses ?? 0;
+  draws = stats.draws ?? 0;
+  moveStats = stats.moveStats ?? {
+    rock: 0,
+    paper: 0,
+    scissors: 0,
+  };
+  gamesPlayed = stats.gamesPlayed ?? 0;
+  gamesWon = stats.gamesWon ?? 0;
+  gamesLost = stats.gamesLost ?? 0;
+  currentGameWinStreak = stats.currentGameWinStreak ?? 0;
+  bestGameWinStreak = stats.bestGameWinStreak ?? 0;
+  currentWinStreak = stats.currentWinStreak ?? 0;
+  bestWinStreak = stats.bestWinStreak ?? 0;
+  matchHistory = stats.matchHistory ?? [];
+}
+function unlockAchievement(key, badgeElement) {
+  if (achievements[key]) return;
+  achievements[key] = true;
+  badgeElement.classList.remove("locked");
+  badgeElement.classList.add("unlocked");
+  badgeElement.classList.add("achievement-unlock");
+  saveAchievements();
+  setTimeout(() => {
+    badgeElement.classList.remove("achievement-unlock");
+  }, 800);
+}
+
+function renderAchievements() {
+  const badges = [
+    {
+      unlocked: achievements.firstWin,
+      element: badgeFirstWin,
+    },
+    {
+      unlocked: achievements.streak3,
+      element: badgeStreak3,
+    },
+    {
+      unlocked: achievements.tenWins,
+      element: badge10Wins,
+    },
+    {
+      unlocked: achievements.games25,
+      element: badge25Games,
+    },
+    {
+      unlocked: achievements.winRate75,
+      element: badge75Rate,
+    },
+  ];
+  badges.forEach((badge) => {
+    if (badge.unlocked) {
+      badge.element.classList.remove("locked");
+      badge.element.classList.add("unlocked");
+    } else {
+      badge.element.classList.remove("unlocked");
+      badge.element.classList.add("locked");
+    }
+  });
+}
+
 function updateAssistantMessage(text) {
-    assistantMessageEl.style.opacity = 0;
-    setTimeout(() => {
-        assistantMessageEl.textContent = text;
-        assistantMessageEl.style.opacity = 1;
-    }, 150);
+  assistantMessageEl.style.opacity = 0;
+  setTimeout(() => {
+    assistantMessageEl.textContent = text;
+    assistantMessageEl.style.opacity = 1;
+  }, 150);
 }
+
 function getAssistantMessage(winner) {
-    const streakMessage = getStreakMessage(winner);
-    if (streakMessage) {
-        return streakMessage;
-    }
-    if (winner === "player") {
-        return randomAssistantMessage("win");
-    }
-    if (winner === "computer") {
-        return randomAssistantMessage("lose");
-    }
-    return randomAssistantMessage("tie");
+  const streakMessage = getStreakMessage(winner);
+  if (streakMessage) {
+    return streakMessage;
+  }
+  if (winner === "player") {
+    return randomAssistantMessage("win");
+  }
+  if (winner === "computer") {
+    return randomAssistantMessage("lose");
+  }
+  return randomAssistantMessage("tie");
 }
+
 const assistantMessages = {
   win: [
     "Nice move!",
@@ -79,10 +192,12 @@ const assistantMessages = {
     "Let's try another round.",
   ],
 };
+
 function randomAssistantMessage(result) {
   const messages = assistantMessages[result];
   return messages[Math.floor(Math.random() * messages.length)];
 }
+
 function getStreakMessage(winner) {
   if (winner === "player") {
     winStreak++;
@@ -104,6 +219,7 @@ function getStreakMessage(winner) {
   }
   return null;
 }
+
 function setOrbState(state, text = "") {
   assistantOrb.className = `assistant-orb ${state}`;
   if (text) {
@@ -193,6 +309,8 @@ voiceBtn.addEventListener("click", () => {
   startListening();
 });
 
+confirmResetBtn.addEventListener("click", resetAllStatistics);
+exportStatsBtn.addEventListener("click", exportStatistics);
 recognition.onstart = () => {
   startWave();
   showVoicePanel();
@@ -329,9 +447,23 @@ let losses = 0;
 let draws = 0;
 // Move Statistics
 let moveStats = {
-    rock: 0,
-    paper: 0,
-    scissors: 0
+  rock: 0,
+  paper: 0,
+  scissors: 0,
+};
+// Game Statistics (First to 5 Matches)
+let gamesPlayed = 0;
+let gamesWon = 0;
+let gamesLost = 0;
+let currentGameWinStreak = 0;
+let bestGameWinStreak = 0;
+// Achievement Status
+let achievements = {
+  firstWin: false,
+  streak3: false,
+  tenWins: false,
+  games25: false,
+  winRate75: false,
 };
 // Recent Match History
 let matchHistory = [];
@@ -367,7 +499,19 @@ buttons.forEach((button) => {
     playRound(button.dataset.choice);
   });
 });
+resetStatsBtn.addEventListener("click", () => {
+  resetModal.classList.add("show");
+});
 
+cancelResetBtn.addEventListener("click", () => {
+  resetModal.classList.remove("show");
+});
+
+resetModal.addEventListener("click", (e) => {
+  if (e.target === resetModal) {
+    resetModal.classList.remove("show");
+  }
+});
 // Reset
 resetBtn.addEventListener("click", resetGame);
 
@@ -390,14 +534,14 @@ document.addEventListener("keydown", (event) => {
 
 // PLAY ROUND
 function playRound(playerChoice) {
-    clickSound.currentTime = 0;
-    clickSound.play().catch(() => {});
-    disableButtons();
-    removeWinnerGlow();
-    playerChoiceEl.classList.remove("bounce");
-    computerChoiceEl.classList.remove("bounce");
-    startThinkingAnimation();
-    setTimeout(() => {
+  clickSound.currentTime = 0;
+  clickSound.play().catch(() => {});
+  disableButtons();
+  removeWinnerGlow();
+  playerChoiceEl.classList.remove("bounce");
+  computerChoiceEl.classList.remove("bounce");
+  startThinkingAnimation();
+  setTimeout(() => {
     stopThinkingAnimation();
     const computerChoice = getComputerChoice();
     moveStats[playerChoice]++;
@@ -439,6 +583,7 @@ function playRound(playerChoice) {
     updateMoveStats();
     updateMatchHistory(playerChoice, computerChoice, winner);
     updatePerformanceInsights(winner);
+    saveStats();
     checkGameWinner();
     if (!gameOver) {
       enableButtons();
@@ -492,73 +637,165 @@ function updateScore() {
   computerScoreEl.textContent = computerScore;
 }
 //UPDATE STATISTICS
-function updateStatistics(){
-    totalGamesEl.textContent = totalGames;
-    winsStatEl.textContent = wins;
-    lossesStatEl.textContent = losses;
-    drawsStatEl.textContent = draws;
-    const winRate =
-        totalGames === 0
-        ? 0
-        : Math.round((wins / totalGames) * 100)
-    winRateEl.textContent = `${winRate}%`;
-}
-function updateMoveStats() {
-    const totalMoves =moveStats.rock + moveStats.paper + moveStats.scissors;
-    const rockPercent = totalMoves ? Math.round((moveStats.rock / totalMoves) * 100) : 0;
-    const paperPercent = totalMoves ? Math.round((moveStats.paper / totalMoves) * 100) : 0;
-    const scissorsPercent = totalMoves ? Math.round((moveStats.scissors / totalMoves) * 100) : 0;
-    document.getElementById("rockUsage").textContent =
-        `${moveStats.rock} (${rockPercent}%)`;
-    document.getElementById("paperUsage").textContent =
-        `${moveStats.paper} (${paperPercent}%)`;
-    document.getElementById("scissorsUsage").textContent =
-        `${moveStats.scissors} (${scissorsPercent}%)`;
-    document.getElementById("rockBar").style.width = `${rockPercent}%`;
-    document.getElementById("paperBar").style.width = `${paperPercent}%`;
-    document.getElementById("scissorsBar").style.width = `${scissorsPercent}%`;
-    const moves = [
-        { name: "Rock", icon: "🪨", count: moveStats.rock },
-        { name: "Paper", icon: "📄", count: moveStats.paper },
-        { name: "Scissors", icon: "✂️", count: moveStats.scissors }
-    ];
-    const mostUsed = moves.reduce((a, b) => a.count >= b.count ? a : b);
-    if (totalMoves === 0) {
-        document.getElementById("mostUsedMoveName").textContent = "No Data";
-        document.getElementById("mostUsedMoveIcon").textContent = "➖";
-    } else {
-        document.getElementById("mostUsedMoveName").textContent = mostUsed.name;
-        document.getElementById("mostUsedMoveIcon").textContent = mostUsed.icon;
-    }
+function updateStatistics() {
+  totalGamesEl.textContent = totalGames;
+  winsStatEl.textContent = wins;
+  lossesStatEl.textContent = losses;
+  drawsStatEl.textContent = draws;
+  const winRate = totalGames === 0 ? 0 : Math.round((wins / totalGames) * 100);
+  winRateEl.textContent = `${winRate}%`;
 }
 
-function updateMatchHistory(playerMove, computerMove, winner) {
-    const historyList = document.getElementById("historyList");
-    matchHistory.unshift({
-        player: playerMove,
-        computer: computerMove,
-        result: winner
-    });
-    if (matchHistory.length > 10) {
-        matchHistory.pop();
+function resetAllStatistics() {
+  // Round Statistics
+  totalGames = 0;
+  wins = 0;
+  losses = 0;
+  draws = 0;
+  // Move Statistics
+  moveStats = {
+    rock: 0,
+    paper: 0,
+    scissors: 0,
+  };
+  // Match Statistics
+  gamesPlayed = 0;
+  gamesWon = 0;
+  gamesLost = 0;
+  // Streaks
+  currentGameWinStreak = 0;
+  bestGameWinStreak = 0;
+  currentWinStreak = 0;
+  bestWinStreak = 0;
+  // History
+  matchHistory = [];
+  // Achievements
+  achievements = {
+    firstWin: false,
+    streak3: false,
+    tenWins: false,
+    games25: false,
+    winRate75: false,
+  };
+  // Clear storage
+  localStorage.removeItem("rpsStats");
+  localStorage.removeItem("rpsAchievements");
+  // Refresh UI
+  updateStatistics();
+  updateMoveStats();
+  renderMatchHistory();
+  document.getElementById("favoriteMove").textContent = "-";
+  document.getElementById("currentStreak").textContent = "0";
+  document.getElementById("bestStreak").textContent = "0";
+  document.getElementById("performanceRating").textContent = "Beginner";
+  renderAchievements();
+  resetModal.classList.remove("show");
+}
+
+function exportStatistics() {
+  const exportData = {
+    exportedOn: new Date().toLocaleString(),
+    roundStatistics: {
+      totalGames,
+      wins,
+      losses,
+      draws,
+      winRate: totalGames
+        ? `${Math.round((wins / totalGames) * 100)}%`
+        : "0%"
+    },
+    moveStatistics: moveStats,
+    matchStatistics: {
+      gamesPlayed,
+      gamesWon,
+      gamesLost
+    },
+    streaks: {
+      currentGameWinStreak,
+      bestGameWinStreak,
+      currentWinStreak,
+      bestWinStreak
+    },
+
+    achievements,
+    recentMatches: matchHistory
+  };
+  const blob = new Blob(
+    [JSON.stringify(exportData, null, 2)],
+    {
+      type: "application/json"
     }
-    historyList.innerHTML = "";
-    matchHistory.forEach(match => {
-        let resultText = "";
-        let resultClass = "";
-        if (match.result === "player") {
-            resultText = "Win";
-            resultClass = "win";
-        }
-        else if (match.result === "computer") {
-            resultText = "Loss";
-            resultClass = "loss";
-        }
-        else {
-            resultText = "Draw";
-            resultClass = "draw";
-        }
-        historyList.innerHTML += `
+  );
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `rps-stats-${new Date().toISOString().split("T")[0]}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function updateMoveStats() {
+  const totalMoves = moveStats.rock + moveStats.paper + moveStats.scissors;
+  const rockPercent = totalMoves
+    ? Math.round((moveStats.rock / totalMoves) * 100)
+    : 0;
+  const paperPercent = totalMoves
+    ? Math.round((moveStats.paper / totalMoves) * 100)
+    : 0;
+  const scissorsPercent = totalMoves
+    ? Math.round((moveStats.scissors / totalMoves) * 100)
+    : 0;
+  document.getElementById("rockUsage").textContent =
+    `${moveStats.rock} (${rockPercent}%)`;
+  document.getElementById("paperUsage").textContent =
+    `${moveStats.paper} (${paperPercent}%)`;
+  document.getElementById("scissorsUsage").textContent =
+    `${moveStats.scissors} (${scissorsPercent}%)`;
+  document.getElementById("rockBar").style.width = `${rockPercent}%`;
+  document.getElementById("paperBar").style.width = `${paperPercent}%`;
+  document.getElementById("scissorsBar").style.width = `${scissorsPercent}%`;
+  const moves = [
+    { name: "Rock", icon: "🪨", count: moveStats.rock },
+    { name: "Paper", icon: "📄", count: moveStats.paper },
+    { name: "Scissors", icon: "✂️", count: moveStats.scissors },
+  ];
+  const mostUsed = moves.reduce((a, b) => (a.count >= b.count ? a : b));
+  if (totalMoves === 0) {
+    document.getElementById("mostUsedMoveName").textContent = "No Data";
+    document.getElementById("mostUsedMoveIcon").textContent = "➖";
+  } else {
+    document.getElementById("mostUsedMoveName").textContent = mostUsed.name;
+    document.getElementById("mostUsedMoveIcon").textContent = mostUsed.icon;
+  }
+}
+
+function renderMatchHistory() {
+  const historyList = document.getElementById("historyList");
+  historyList.innerHTML = "";
+  if (matchHistory.length === 0) {
+    historyList.innerHTML = `
+            <div class="history-empty">
+                Play a game to see your recent matches.
+            </div>
+        `;
+    return;
+  }
+  matchHistory.forEach((match) => {
+    let resultText = "";
+    let resultClass = "";
+    if (match.result === "player") {
+      resultText = "Win";
+      resultClass = "win";
+    } else if (match.result === "computer") {
+      resultText = "Loss";
+      resultClass = "loss";
+    } else {
+      resultText = "Draw";
+      resultClass = "draw";
+    }
+    historyList.innerHTML += `
             <div class="history-item">
                 <div class="history-left">
                     <span>${icons[match.player]}</span>
@@ -570,45 +807,55 @@ function updateMatchHistory(playerMove, computerMove, winner) {
                 </div>
             </div>
         `;
-    });
+  });
+}
+
+function updateMatchHistory(playerMove, computerMove, winner) {
+  matchHistory.unshift({
+    player: playerMove,
+    computer: computerMove,
+    result: winner,
+  });
+  if (matchHistory.length > 10) {
+    matchHistory.pop();
+  }
+  renderMatchHistory();
 }
 
 function updatePerformanceInsights(winner) {
-    // Update streaks
-    if (winner === "player") {
-        currentWinStreak++;
-        if (currentWinStreak > bestWinStreak) {
-            bestWinStreak = currentWinStreak;
-        }
-    } else {
-        currentWinStreak = 0;
+  // Update streaks
+  if (winner === "player") {
+    currentWinStreak++;
+    if (currentWinStreak > bestWinStreak) {
+      bestWinStreak = currentWinStreak;
     }
-    // Favorite Move
-    const moves = [
-        { name: "🪨 Rock", count: moveStats.rock },
-        { name: "📄 Paper", count: moveStats.paper },
-        { name: "✂️ Scissors", count: moveStats.scissors }
-    ];
-    const favorite = moves.reduce((a, b) => a.count >= b.count ? a : b);
-    document.getElementById("favoriteMove").textContent =
-        (favorite.count === 0) ? "-" : favorite.name;
-    document.getElementById("currentStreak").textContent = currentWinStreak;
-    document.getElementById("bestStreak").textContent = bestWinStreak;
-    // Performance Rating
-    const winRate = totalGames
-        ? (wins / totalGames) * 100
-        : 0;
-    let rating = "Beginner";
-    if (winRate >= 90) {
-        rating = "Master";
-    } else if (winRate >= 75) {
-        rating = "Expert";
-    } else if (winRate >= 60) {
-        rating = "Skilled";
-    } else if (winRate >= 45) {
-        rating = "Improving";
-    }
-    document.getElementById("performanceRating").textContent = rating;
+  } else {
+    currentWinStreak = 0;
+  }
+  // Favorite Move
+  const moves = [
+    { name: "🪨 Rock", count: moveStats.rock },
+    { name: "📄 Paper", count: moveStats.paper },
+    { name: "✂️ Scissors", count: moveStats.scissors },
+  ];
+  const favorite = moves.reduce((a, b) => (a.count >= b.count ? a : b));
+  document.getElementById("favoriteMove").textContent =
+    favorite.count === 0 ? "-" : favorite.name;
+  document.getElementById("currentStreak").textContent = currentWinStreak;
+  document.getElementById("bestStreak").textContent = bestWinStreak;
+  // Performance Rating
+  const winRate = totalGames ? (wins / totalGames) * 100 : 0;
+  let rating = "Beginner";
+  if (winRate >= 90) {
+    rating = "Master";
+  } else if (winRate >= 75) {
+    rating = "Expert";
+  } else if (winRate >= 60) {
+    rating = "Skilled";
+  } else if (winRate >= 45) {
+    rating = "Improving";
+  }
+  document.getElementById("performanceRating").textContent = rating;
 }
 
 // SCORE ANIMATION
@@ -629,6 +876,26 @@ function animateScore(element) {
   }, 300);
 }
 
+//CHECK ACHIEVEMENTS
+function checkAchievements() {
+  const gameWinRate = gamesPlayed ? (gamesWon / gamesPlayed) * 100 : 0;
+  if (gamesWon >= 1) {
+    unlockAchievement("firstWin", badgeFirstWin);
+  }
+  if (currentGameWinStreak >= 3) {
+    unlockAchievement("streak3", badgeStreak3);
+  }
+  if (gamesWon >= 10) {
+    unlockAchievement("tenWins", badge10Wins);
+  }
+  if (gamesPlayed >= 25) {
+    unlockAchievement("games25", badge25Games);
+  }
+  if (gamesPlayed >= 20 && gameWinRate >= 75) {
+    unlockAchievement("winRate75", badge75Rate);
+  }
+}
+
 // GAME WINNER
 function checkGameWinner() {
   if (playerScore >= 5) {
@@ -636,6 +903,11 @@ function checkGameWinner() {
     celebrate();
     playerCard.classList.add("winner");
     resultFade("🏆 Congratulations! You Won The Game!");
+    gamesPlayed++;
+    gamesWon++;
+    currentGameWinStreak++;
+    bestGameWinStreak = Math.max(bestGameWinStreak, currentGameWinStreak);
+    checkAchievements();
     if (playerScore > highScore) {
       highScore = playerScore;
       localStorage.setItem("highScore", highScore);
@@ -646,6 +918,10 @@ function checkGameWinner() {
     computerCard.classList.add("winner");
     shakeScreen();
     resultFade("💀 Computer Won The Game!");
+    gamesPlayed++;
+    gamesLost++;
+    currentGameWinStreak = 0;
+    checkAchievements();
   }
 }
 
@@ -730,6 +1006,12 @@ function resetGame() {
 }
 
 // INITIALIZE
+loadStats();
+loadAchievements();
 updateScore();
 updateStatistics();
+updateMoveStats();
+renderMatchHistory();
+updatePerformanceInsights();
+renderAchievements();
 highScoreEl.textContent = highScore;
